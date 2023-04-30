@@ -54,4 +54,4 @@ this is due to api quota limit. the code will fallback on any secondary json fil
 
 ## future plans
 i am planning on getting a handful verified of api keys (30ish) which would allow anyone to use it without the hassle of having to make their own.
-<meta name="google-site-verification" content="bAYrjHLmU_aLYE9MEOVVJcuH6oDcdXHWJJREedG78Zo" />
+## <meta name="google-site-verification" content="bAYrjHLmU_aLYE9MEOVVJcuH6oDcdXHWJJREedG78Zo" />
