@@ -47,5 +47,5 @@ run the run_transfer.bat file by double clicking it. this will automatically ins
 ## notes
 if you make multple client service files rename them with  a number. eg 1 more api file should be named client_secrets_1.json. the client_secrets.json is still required. 
 allowed names:
-client_secret.json, client_secret_1.json, client_secret_2.json, etc until client_secrets_10.json
+client_secrets.json, client_secrets_1.json, client_secrets_2.json, etc until clients_secrets_10.json
 this is due to api quota limit. the code will fallback on any secondary json file from another project.
