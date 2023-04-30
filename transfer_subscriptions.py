@@ -11,18 +11,24 @@ def authenticate_account(scope, client_secrets_files):
     for client_secrets_file in client_secrets_files:
         try:
             flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file, scope)
-            return flow.run_local_server(port=0, prompt='consent')
+            credentials = flow.run_local_server(port=0, prompt='consent')
+            
+            youtube = googleapiclient.discovery.build("youtube", "v3", credentials=credentials)
+            # Test the API to see if the quota is exceeded
+            youtube.channels().list(part="snippet", mine=True).execute()
+            
+            return credentials
         except HttpError as error:
             print(f"API quota reached for {client_secrets_file}. Trying next file.")
             continue
     raise Exception("All client secrets files reached their API quota.")
 
-def get_playlists(youtube, channelId):
-    playlists = []
+def get_subscriptions(youtube, channelId):
+    subscriptions = []
     nextPageToken = None
 
     while True:
-        request = youtube.playlists().list(
+        request = youtube.subscriptions().list(
             part="snippet",
             channelId=channelId,
             maxResults=50,
@@ -31,35 +37,13 @@ def get_playlists(youtube, channelId):
         response = request.execute()
 
         for item in response["items"]:
-            playlists.append(item["id"])
+            subscriptions.append(item["snippet"]["resourceId"]["channelId"])
 
         nextPageToken = response.get("nextPageToken")
         if nextPageToken is None:
             break
 
-    return playlists
-
-def get_videos_from_playlist(youtube, playlist_id):
-    videos = []
-    nextPageToken = None
-
-    while True:
-        request = youtube.playlistItems().list(
-            part="snippet",
-            playlistId=playlist_id,
-            maxResults=50,
-            pageToken=nextPageToken
-        )
-        response = request.execute()
-
-        for item in response["items"]:
-            videos.append(item["snippet"]["resourceId"]["videoId"])
-
-        nextPageToken = response.get("nextPageToken")
-        if nextPageToken is None:
-            break
-
-    return videos
+    return subscriptions
 
 def read_ids(filename):
     try:
@@ -74,7 +58,7 @@ def write_ids(filename, ids):
     with open(filename, "w") as file:
         json.dump(ids, file)
 
-def main_transfer_playlists():
+def main_transfer_subscriptions():
     scope = [
         "https://www.googleapis.com/auth/youtube.force-ssl",
         "https://www.googleapis.com/auth/youtube"
@@ -88,76 +72,36 @@ def main_transfer_playlists():
     source_channel_request = youtube_source.channels().list(part="snippet", mine=True)
     source_channel_id = source_channel_request.execute()["items"][0]["id"]
 
-    playlists = get_playlists(youtube_source, source_channel_id)
-    transferred_filename = "transferred_playlists.json"
-    skipped_filename = "skipped_playlists.json"
+    subscriptions = get_subscriptions(youtube_source, source_channel_id)
+    transferred_filename = "transferred_subscriptions.json"
+    skipped_filename = "skipped_subscriptions.json"
     transferred_ids = read_ids(transferred_filename)
     skipped_ids = read_ids(skipped_filename)
 
-    # Transfer playlists
-    for playlist_id in playlists:
-        if playlist_id not in transferred_ids and playlist_id not in skipped_ids:
+    # Transfer subscriptions
+    for channel_id in subscriptions:
+        if channel_id not in transferred_ids and channel_id not in skipped_ids:
             try:
-                playlist_request = youtube_source.playlists().list(part="snippet", id=playlist_id)
-                playlist_response = playlist_request.execute()
-["items"][0]["id"]
-
-    playlists = get_playlists(youtube_source, source_channel_id)
-    transferred_filename = "transferred_playlists.json"
-    skipped_filename = "skipped_playlists.json"
-    transferred_ids = read_ids(transferred_filename)
-    skipped_ids = read_ids(skipped_filename)
-
-    # Transfer playlists
-    for playlist_id in playlists:
-        if playlist_id not in transferred_ids and playlist_id not in skipped_ids:
-            try:
-                playlist_request = youtube_source.playlists().list(part="snippet", id=playlist_id)
-                playlist_response = playlist_request.execute()
-                playlist_title = playlist_response["items"][0]["snippet"]["title"]
-
-                # Create a new playlist in the target account
-                new_playlist = youtube_target.playlists().insert(part="snippet,status", body={
+                youtube_target.subscriptions().insert(part="snippet", body={
                     "snippet": {
-                        "title": playlist_title,
-                        "description": "Transferred playlist"
-                    },
-                    "status": {
-                        "privacyStatus": "private"
+                        "resourceId": {
+                            "kind": "youtube#channel",
+                            "channelId": channel_id
+                        }
                     }
                 }).execute()
-
-                new_playlist_id = new_playlist["id"]
-
-                # Get videos from the source playlist and add them to the new playlist
-                videos = get_videos_from_playlist(youtube_source, playlist_id)
-                for video_id in videos:
-                    try:
-                        youtube_target.playlistItems().insert(part="snippet", body={
-                            "snippet": {
-                                "playlistId": new_playlist_id,
-                                "resourceId": {
-                                    "kind": "youtube#video",
-                                    "videoId": video_id
-                                }
-                            }
-                        }).execute()
-                    except googleapiclient.errors.HttpError as error:
-                        print(f"Error adding video {video_id} to the playlist: {error}")
-
-                transferred_ids.append(playlist_id)
+                transferred_ids.append(channel_id)
             except googleapiclient.errors.HttpError as error:
                 print(f"Error: {error}")
-                print(f"Skipping playlist ID {playlist_id}")
-                if playlist_id not in skipped_ids:
-                    skipped_ids.append(playlist_id)
+                print(f"Skipping subscription to channel ID {channel_id}")
+                if channel_id not in skipped_ids:
+                    skipped_ids.append(channel_id)
         else:
-            print(f"Playlist ID {playlist_id} already transferred or skipped.")
+            print(f"Subscription to channel ID {channel_id} already transferred or skipped.")
 
     write_ids(transferred_filename, transferred_ids)
     write_ids(skipped_filename, skipped_ids)
-    print("Playlists transferred successfully.")
+    print("Subscriptions transferred successfully.")
 
 if __name__ == "__main__":
-    main_transfer_playlists()
-
+    main_transfer_subscriptions()
