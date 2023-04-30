@@ -3,16 +3,10 @@ moves youtube subsciptions and youtube playlists between accounts
 
 ## Prerequisites
 
-To use this script, you need to have Python installed on your system, along with the following packages:
-
-- `google-auth`
-- `google-auth-oauthlib`
-- `google-auth-httplib2`
-- `google-api-python-client`
-
-You can install the required packages using pip: pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+To use this script, you need to have Python installed on your system.
 
 
+##Installing json
 YOU NEED THE .JSON FILE TO RUN THIS AND ADD TEST USERS SO API ISNT BLOCKED SO PLEASE DO THAT BY= 
 
 1. MAKE THE client_secrets.json FILE:
