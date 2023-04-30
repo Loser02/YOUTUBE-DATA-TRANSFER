@@ -10,7 +10,6 @@ clone repository by running this in command prompt:
 <pre>
 git clone https://github.com/Loser02/YOUTUBE-DATA-TRANSFER.git
 </pre> 
-or download from google drive https://drive.google.com/file/d/18aCFCUkxkGM-sN1wigBz71bqW58PTYOV/view?usp=sharing
 
 ## Installing json
 YOU NEED THE .JSON FILE TO RUN THIS AND ADD TEST USERS SO API ISNT BLOCKED SO PLEASE DO THAT BY= 
@@ -46,5 +45,7 @@ Enter the email addresses of the Google accounts you'd like to grant access to y
 run the run_transfer.bat file by double clicking it. this will automatically install required modules. 1st login:source account 2nd login:target account
 
 ## notes
-if you make multple client service files rename them with  a number. eg 1 more api file should be named client_secrets_1.json
+if you make multple client service files rename them with  a number. eg 1 more api file should be named client_secrets_1.json. the client_secrets.json is still required. 
+allowed names:
+client_secret.json, client_secret_1.json, client_secret_2.json, etc until client_secrets_10.json
 
