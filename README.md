@@ -51,3 +51,6 @@ if you make multple client service files rename them with  a number. eg 1 more a
 allowed names:
 client_secrets.json, client_secrets_1.json, client_secrets_2.json, etc until clients_secrets_10.json
 this is due to api quota limit. the code will fallback on any secondary json file from another project.
+
+## future plans
+i am planning on getting a handful of api keys (30ish) which would allow anyone to use it without the hassle of having to make their own.
