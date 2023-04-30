@@ -6,11 +6,10 @@ moves youtube subsciptions and youtube playlists between accounts
 To use this script, you need to have Python and git installed on your system.
 
 ## install
-use 
+clone repository by running this in command prompt:
 <pre>
 git clone https://github.com/Loser02/YOUTUBE-DATA-TRANSFER.git
 </pre> 
-to clone repository
 or download from google drive https://drive.google.com/file/d/18aCFCUkxkGM-sN1wigBz71bqW58PTYOV/view?usp=sharing
 
 ## Installing json
