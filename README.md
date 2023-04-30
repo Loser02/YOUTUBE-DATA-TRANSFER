@@ -5,6 +5,10 @@ moves youtube subsciptions and youtube playlists between accounts
 
 To use this script, you need to have Python and git installed on your system.
 
+## Usage
+
+run the run_transfer.bat file by double clicking it. this will automatically install required modules. 1st login:source account 2nd login:target account
+
 ## install
 clone repository by running this in command prompt:
 <pre>
@@ -39,10 +43,6 @@ STEP 2=In the left-hand menu, navigate to "APIs & Services" > "OAuth consent scr
 STEP 3=Scroll down to the "Test users" section.
 Click "Add Users" to add test users.
 Enter the email addresses of the Google accounts you'd like to grant access to your app. These should be the email addresses of the source and target accounts you want to transfer data between. Click "SAVE" to save the test users. <img width="1920" alt="image" src="https://user-images.githubusercontent.com/127698874/235309879-8652d891-6ff9-40c4-b9aa-52a7d4ac148a.png">
-
-## Usage
-
-run the run_transfer.bat file by double clicking it. this will automatically install required modules. 1st login:source account 2nd login:target account
 
 ## notes
 if you make multple client service files rename them with  a number. eg 1 more api file should be named client_secrets_1.json. the client_secrets.json is still required. 
