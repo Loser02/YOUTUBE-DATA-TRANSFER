@@ -1,5 +1,5 @@
 # YOUTUBE-DATA-TRANSFER
-moves youtube subsciptions and youtube playlists between accounts
+moves youtube subscriptions and youtube playlists between accounts
 
 ## Prerequisites
 
