@@ -5,10 +5,17 @@ import json
 
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.errors import HttpError
 
-def authenticate_account(scope):
-    flow = InstalledAppFlow.from_client_secrets_file("client_secrets.json", scope)
-    return flow.run_local_server(port=0, prompt='consent')
+def authenticate_account(scope, client_secrets_files):
+    for client_secrets_file in client_secrets_files:
+        try:
+            flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file, scope)
+            return flow.run_local_server(port=0, prompt='consent')
+        except HttpError as error:
+            print(f"API quota reached for {client_secrets_file}. Trying next file.")
+            continue
+    raise Exception("All client secrets files reached their API quota.")
 
 def get_subscriptions(youtube, channelId):
     subscriptions = []
@@ -50,8 +57,9 @@ def main_transfer_subscriptions():
         "https://www.googleapis.com/auth/youtube.force-ssl",
         "https://www.googleapis.com/auth/youtube"
     ]
-    source_credentials = authenticate_account(scope)
-    target_credentials = authenticate_account(scope)
+    client_secrets_files = ["client_secrets.json"] + [f"client_secrets_{i}.json" for i in range(1, 11)]
+    source_credentials = authenticate_account(scope, client_secrets_files)
+    target_credentials = authenticate_account(scope, client_secrets_files)
     youtube_source = googleapiclient.discovery.build("youtube", "v3", credentials=source_credentials)
     youtube_target = googleapiclient.discovery.build("youtube", "v3", credentials=target_credentials)
 
