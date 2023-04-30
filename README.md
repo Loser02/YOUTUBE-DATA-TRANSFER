@@ -53,4 +53,4 @@ client_secrets.json, client_secrets_1.json, client_secrets_2.json, etc until cli
 this is due to api quota limit. the code will fallback on any secondary json file from another project.
 
 ## future plans
-i am planning on getting a handful of api keys (30ish) which would allow anyone to use it without the hassle of having to make their own.
+i am planning on getting a handful verified of api keys (30ish) which would allow anyone to use it without the hassle of having to make their own.
