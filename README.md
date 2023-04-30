@@ -44,3 +44,7 @@ Enter the email addresses of the Google accounts you'd like to grant access to y
 ## Usage
 
 run the run_transfer.bat file by double clicking it. this will automatically install required modules. 1st login:source account 2nd login:target account
+
+## notes
+if you make multple client service files rename them with  a number. eg 1 more api file should be named client_secrets_1.json
+
