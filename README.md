@@ -3,9 +3,11 @@ moves youtube subsciptions and youtube playlists between accounts
 
 ## Prerequisites
 
-To use this script, you need to have Python installed on your system.
+To use this script, you need to have Python and git installed on your system.
 
-
+## install
+use "git clone https://github.com/Loser02/YOUTUBE-DATA-TRANSFER.git" to clone repository
+or download from google drive https://drive.google.com/file/d/18aCFCUkxkGM-sN1wigBz71bqW58PTYOV/view?usp=sharing
 ## Installing json
 YOU NEED THE .JSON FILE TO RUN THIS AND ADD TEST USERS SO API ISNT BLOCKED SO PLEASE DO THAT BY= 
 
