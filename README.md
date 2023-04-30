@@ -27,8 +27,7 @@ STEP 10=In the "Add credentials to your project" page, select "YouTube Data API 
 STEP 11=fill in any app name and your email address= <img width="464" alt="image" src="https://user-images.githubusercontent.com/127698874/235309363-8ac81f56-5bdb-4a89-88c8-0c3a937d18a4.png">
 STEP 12=click add or remove scopes and type https://www.googleapis.com/auth/youtube.force-ssl into search bar. check it and then update and then save and countinue. <img width="1920" alt="image" src="https://user-images.githubusercontent.com/127698874/235309494-867a3cd7-2ba2-4ed2-8e86-c1c2f7f29399.png">
 STEP 13=select desktop app and click create <img width="450" alt="image" src="https://user-images.githubusercontent.com/127698874/235309570-d53fa4ca-81de-495a-a8d4-df59b20a2f3f.png">
-STEP 14=download and save the file as client_secrets.json in the same directory as the python script. <img width="889" alt="image" src="https://user-images.githubusercontent.com/127698874/235309691-0b031879-3ba0-488e-8bf7-22f211529c5d.png">
-
+STEP 14=download and save the file as client_secrets.json in the same directory as the python script. <img width="911" alt="image" src="https://user-images.githubusercontent.com/127698874/235346540-d781890a-1f75-4d70-b3ac-d2b3495830f7.png">
 2. ADDING ACCOUNTS TO TESTERS:
 STEP 1=Go to the https://console.cloud.google.com/
 STEP 2=In the left-hand menu, navigate to "APIs & Services" > "OAuth consent screen." <img width="1923" alt="image" src="https://user-images.githubusercontent.com/127698874/235309806-c691e2c1-b26c-4bdb-8ac6-4647940e0ea7.png">
