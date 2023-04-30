@@ -17,12 +17,12 @@ def authenticate_account(scope, client_secrets_files):
             continue
     raise Exception("All client secrets files reached their API quota.")
 
-def get_subscriptions(youtube, channelId):
-    subscriptions = []
+def get_playlists(youtube, channelId):
+    playlists = []
     nextPageToken = None
 
     while True:
-        request = youtube.subscriptions().list(
+        request = youtube.playlists().list(
             part="snippet",
             channelId=channelId,
             maxResults=50,
@@ -31,13 +31,35 @@ def get_subscriptions(youtube, channelId):
         response = request.execute()
 
         for item in response["items"]:
-            subscriptions.append(item["snippet"]["resourceId"]["channelId"])
+            playlists.append(item["id"])
 
         nextPageToken = response.get("nextPageToken")
         if nextPageToken is None:
             break
 
-    return subscriptions
+    return playlists
+
+def get_videos_from_playlist(youtube, playlist_id):
+    videos = []
+    nextPageToken = None
+
+    while True:
+        request = youtube.playlistItems().list(
+            part="snippet",
+            playlistId=playlist_id,
+            maxResults=50,
+            pageToken=nextPageToken
+        )
+        response = request.execute()
+
+        for item in response["items"]:
+            videos.append(item["snippet"]["resourceId"]["videoId"])
+
+        nextPageToken = response.get("nextPageToken")
+        if nextPageToken is None:
+            break
+
+    return videos
 
 def read_ids(filename):
     try:
@@ -52,7 +74,7 @@ def write_ids(filename, ids):
     with open(filename, "w") as file:
         json.dump(ids, file)
 
-def main_transfer_subscriptions():
+def main_transfer_playlists():
     scope = [
         "https://www.googleapis.com/auth/youtube.force-ssl",
         "https://www.googleapis.com/auth/youtube"
@@ -66,36 +88,76 @@ def main_transfer_subscriptions():
     source_channel_request = youtube_source.channels().list(part="snippet", mine=True)
     source_channel_id = source_channel_request.execute()["items"][0]["id"]
 
-    subscriptions = get_subscriptions(youtube_source, source_channel_id)
-    transferred_filename = "transferred_subscriptions.json"
-    skipped_filename = "skipped_subscriptions.json"
+    playlists = get_playlists(youtube_source, source_channel_id)
+    transferred_filename = "transferred_playlists.json"
+    skipped_filename = "skipped_playlists.json"
     transferred_ids = read_ids(transferred_filename)
     skipped_ids = read_ids(skipped_filename)
 
-    # Transfer subscriptions
-    for channel_id in subscriptions:
-        if channel_id not in transferred_ids and channel_id not in skipped_ids:
+    # Transfer playlists
+    for playlist_id in playlists:
+        if playlist_id not in transferred_ids and playlist_id not in skipped_ids:
             try:
-                youtube_target.subscriptions().insert(part="snippet", body={
+                playlist_request = youtube_source.playlists().list(part="snippet", id=playlist_id)
+                playlist_response = playlist_request.execute()
+["items"][0]["id"]
+
+    playlists = get_playlists(youtube_source, source_channel_id)
+    transferred_filename = "transferred_playlists.json"
+    skipped_filename = "skipped_playlists.json"
+    transferred_ids = read_ids(transferred_filename)
+    skipped_ids = read_ids(skipped_filename)
+
+    # Transfer playlists
+    for playlist_id in playlists:
+        if playlist_id not in transferred_ids and playlist_id not in skipped_ids:
+            try:
+                playlist_request = youtube_source.playlists().list(part="snippet", id=playlist_id)
+                playlist_response = playlist_request.execute()
+                playlist_title = playlist_response["items"][0]["snippet"]["title"]
+
+                # Create a new playlist in the target account
+                new_playlist = youtube_target.playlists().insert(part="snippet,status", body={
                     "snippet": {
-                        "resourceId": {
-                            "kind": "youtube#channel",
-                            "channelId": channel_id
-                        }
+                        "title": playlist_title,
+                        "description": "Transferred playlist"
+                    },
+                    "status": {
+                        "privacyStatus": "private"
                     }
                 }).execute()
-                transferred_ids.append(channel_id)
+
+                new_playlist_id = new_playlist["id"]
+
+                # Get videos from the source playlist and add them to the new playlist
+                videos = get_videos_from_playlist(youtube_source, playlist_id)
+                for video_id in videos:
+                    try:
+                        youtube_target.playlistItems().insert(part="snippet", body={
+                            "snippet": {
+                                "playlistId": new_playlist_id,
+                                "resourceId": {
+                                    "kind": "youtube#video",
+                                    "videoId": video_id
+                                }
+                            }
+                        }).execute()
+                    except googleapiclient.errors.HttpError as error:
+                        print(f"Error adding video {video_id} to the playlist: {error}")
+
+                transferred_ids.append(playlist_id)
             except googleapiclient.errors.HttpError as error:
                 print(f"Error: {error}")
-                print(f"Skipping subscription to channel ID {channel_id}")
-                if channel_id not in skipped_ids:
-                    skipped_ids.append(channel_id)
+                print(f"Skipping playlist ID {playlist_id}")
+                if playlist_id not in skipped_ids:
+                    skipped_ids.append(playlist_id)
         else:
-            print(f"Subscription to channel ID {channel_id} already transferred or skipped.")
+            print(f"Playlist ID {playlist_id} already transferred or skipped.")
 
     write_ids(transferred_filename, transferred_ids)
     write_ids(skipped_filename, skipped_ids)
-    print("Subscriptions transferred successfully.")
+    print("Playlists transferred successfully.")
 
 if __name__ == "__main__":
-    main_transfer_subscriptions()
+    main_transfer_playlists()
+
